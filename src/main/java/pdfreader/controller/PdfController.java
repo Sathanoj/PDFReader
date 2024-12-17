@@ -16,12 +16,23 @@ public class PdfController {
     public PdfController(MainFrame view, Reader model) {
         this.view = view;
         this.model = model;
+        view.getFullSize().addActionListener(e -> fullSize());
         view.getNextButton().addActionListener(e -> nextPage());
         view.getPreviousButton().addActionListener(e -> previousPage());
         view.getZoomInButton().addActionListener(e -> zoomIn());
         view.getZoomOutButton().addActionListener(e -> zoomOut());
 
         updatePage();
+    }
+
+    private void fullSize() {
+        try {
+            BufferedImage resetFullSize = model.renderPdfAt100Percent(currentPage, view.getWidth(), view.getHeight());
+            view.getPdfLabel().setIcon(new ImageIcon(resetFullSize));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     private void nextPage() {
@@ -54,6 +65,8 @@ public class PdfController {
         try {
             BufferedImage pageImage = model.renderPage(currentPage, 150 * zoom);
             view.getPdfLabel().setIcon(new ImageIcon(pageImage));
+            System.out.println("Zoom value: " + zoom);
+            System.out.println("Width: " + view.getWidth() + " Height: " + view.getHeight());
         } catch (IOException e) {
             JOptionPane.showMessageDialog(view, "Error rendering page: " + e.getMessage());
         }
