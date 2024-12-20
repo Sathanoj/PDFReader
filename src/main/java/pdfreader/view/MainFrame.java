@@ -1,26 +1,21 @@
 package pdfreader.view;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.rendering.PDFRenderer;
-
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 public class MainFrame extends JFrame {
     private final JScrollPane scrollPane;
     private final JLabel pdfLabel;
     private final JButton nextButton,
-                    previousButton,
-                    zoomInButton,
-                    zoomOutButton,
-                    fullSize;
+                        previousButton,
+                        zoomInButton,
+                        zoomOutButton,
+                        fullSize;
+    private JTextField currentPage;
 
     public MainFrame() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(new Dimension(628, 959));
+        this.setSize(new Dimension(707, 1028));
         this.setLocationRelativeTo(null);
         this.setLayout(new BorderLayout());
 
@@ -31,14 +26,17 @@ public class MainFrame extends JFrame {
         JPanel buttonPanel = new JPanel();
         nextButton = new JButton("Next");
         previousButton = new JButton("Previous");
-        zoomInButton = new JButton("Zoom In");
-        zoomOutButton = new JButton("Zoom Out");
+        zoomInButton = new JButton("Zoom +");
+        zoomOutButton = new JButton("Zoom -");
         fullSize = new JButton("full");
+        currentPage = new JTextField(5);
+
         buttonPanel.add(fullSize);
         buttonPanel.add(previousButton);
         buttonPanel.add(nextButton);
         buttonPanel.add(zoomInButton);
         buttonPanel.add(zoomOutButton);
+        buttonPanel.add(currentPage);
 
         this.add(buttonPanel, BorderLayout.SOUTH);
     }

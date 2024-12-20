@@ -17,7 +17,7 @@ public class Main {
         SwingUtilities.invokeLater(() -> {
             try {
                 MainFrame frame = new MainFrame();
-                Reader reader = new Reader("10 Livro Estrutura de Dados.pdf");
+                Reader reader = new Reader("Sigmund_Freud_O_Infamiliar.pdf");
                 new PdfController(frame, reader);
                 frame.setVisible(true);
             } catch (IOException e) {
