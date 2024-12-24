@@ -1,5 +1,6 @@
 package pdfreader.controller;
 
+import pdfreader.model.DocInformation;
 import pdfreader.model.Reader;
 import pdfreader.view.MainFrame;
 
@@ -10,24 +11,23 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class PdfController {
-    private BufferedImage pageImage;
     private final MainFrame view;
     private final Reader model;
+    private DocInformation information;
 
     public PdfController(MainFrame view, Reader model) {
         this.view = view;
         this.model = model;
-
-        changePage();
+        information = new DocInformation(model);
 
         view.getFullSize().addActionListener(e -> fullSize());
         view.getNextButton().addActionListener(e -> nextPage());
         view.getPreviousButton().addActionListener(e -> previousPage());
         view.getZoomInButton().addActionListener(e -> zoomIn());
         view.getZoomOutButton().addActionListener(e -> zoomOut());
-
+        view.getJumpToPageButton().addActionListener(e -> changePageTo());
+        changePage();
         updatePage();
-//        enableTextSelection();
     }
 
     private void changePage() {
@@ -56,7 +56,6 @@ public class PdfController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     private void nextPage() {
@@ -85,6 +84,21 @@ public class PdfController {
         }
     }
 
+    public void changePageTo() {
+//        model.setCurrentPage(4);
+        try {
+            String getValue = view.getCurrentPageFrame().getText();
+            model.findPage(Integer.parseInt(getValue));
+            updatePage();
+
+        } catch (NumberFormatException exception) {
+            System.out.println("deu ruim: " + exception);
+        }
+
+
+//        int value = model.findPage(v2);
+    }
+
     private void enableTextSelection() {
         view.getPdfLabel().addMouseListener(new MouseAdapter() {
             @Override
@@ -97,27 +111,19 @@ public class PdfController {
         });
     }
 
-    private void showDocumentInfo() {
-        int totalPages = model.getTotalPages();
-//        int currentPage2 = this.currentPage; // Supondo que o controlador rastreia a página atual
-//        double progress = model.getReadingProgress(currentPage2);
-
-        System.out.println("Total Pages: " + totalPages);
-//        System.out.printf("Reading Progress: %.2f%%%n", progress);
-    }
-
-
     ///////////////////////////////////////////////////////////////////////////////////////
     private void updatePage() {
         try {
-            pageImage = model.renderPage(model.getCurrentPage(), 150 * model.getZoom());
+            BufferedImage pageImage = model.renderPage(model.getCurrentPage(), 150 * model.getZoom());
             view.getPdfLabel().setIcon(new ImageIcon(pageImage));
 
+            information.showDocumentInfo();
+            System.out.println();
             System.out.println("Zoom value: " + model.getZoom());
             System.out.println("Width: " + view.getWidth() + " Height: " + view.getHeight());
+            System.out.println("----------------------------------------------------------");
         } catch (IOException e) {
             JOptionPane.showMessageDialog(view, "Error rendering page: " + e.getMessage());
         }
     }
 }
-

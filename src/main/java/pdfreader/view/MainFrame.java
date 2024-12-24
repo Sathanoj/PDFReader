@@ -10,8 +10,9 @@ public class MainFrame extends JFrame {
                         previousButton,
                         zoomInButton,
                         zoomOutButton,
-                        fullSize;
-    private JTextField currentPage;
+                        fullSize,
+                        jumpToPageButton;
+    private final JTextField currentPageFrame;
 
     public MainFrame() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -29,14 +30,16 @@ public class MainFrame extends JFrame {
         zoomInButton = new JButton("Zoom +");
         zoomOutButton = new JButton("Zoom -");
         fullSize = new JButton("full");
-        currentPage = new JTextField(5);
+        currentPageFrame = new JTextField(5);
+        jumpToPageButton = new JButton("jumpTo");
 
         buttonPanel.add(fullSize);
         buttonPanel.add(previousButton);
         buttonPanel.add(nextButton);
         buttonPanel.add(zoomInButton);
         buttonPanel.add(zoomOutButton);
-        buttonPanel.add(currentPage);
+        buttonPanel.add(currentPageFrame);
+        buttonPanel.add(jumpToPageButton);
 
         this.add(buttonPanel, BorderLayout.SOUTH);
     }
@@ -66,5 +69,13 @@ public class MainFrame extends JFrame {
 
     public JLabel getPdfLabel() {
         return pdfLabel;
+    }
+
+    public JButton getJumpToPageButton() {
+        return jumpToPageButton;
+    }
+
+    public JTextField getCurrentPageFrame() {
+        return currentPageFrame;
     }
 }
