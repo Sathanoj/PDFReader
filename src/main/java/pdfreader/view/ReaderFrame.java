@@ -3,8 +3,7 @@ package pdfreader.view;
 import javax.swing.*;
 import java.awt.*;
 
-public class MainFrame extends JFrame {
-    private final JScrollPane scrollPane;
+public class ReaderFrame extends JFrame {
     private final JLabel pdfLabel;
     private final JButton nextButton,
                         previousButton,
@@ -14,14 +13,14 @@ public class MainFrame extends JFrame {
                         jumpToPageButton;
     private final JTextField currentPageFrame;
 
-    public MainFrame() {
+    public ReaderFrame() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(new Dimension(707, 1028));
         this.setLocationRelativeTo(null);
         this.setLayout(new BorderLayout());
 
         pdfLabel = new JLabel();
-        scrollPane = new JScrollPane(pdfLabel);
+        JScrollPane scrollPane = new JScrollPane(pdfLabel);
         this.add(scrollPane, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel();

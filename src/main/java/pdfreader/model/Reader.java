@@ -12,10 +12,13 @@ public class Reader {
     private final PDFRenderer renderer;
     private int currentPage = 0;
     private float zoom = 1.0f;
+    private boolean isFullSize;
 
-    public Reader(String pdfPath) throws IOException {
-        document = PDDocument.load(new File(pdfPath));
+
+    public Reader(File pdfPath) throws IOException {
+        document = PDDocument.load(pdfPath);
         renderer = new PDFRenderer(document);
+        isFullSize = false;
     }
 
     public BufferedImage renderPage(int pageIndex, float dpi) throws IOException {
@@ -37,6 +40,7 @@ public class Reader {
         dpi = Math.min(dpi, 300);
 
         PDFRenderer renderer = new PDFRenderer(document);
+
         return renderer.renderImageWithDPI(pageIndex, dpi);
     }
 
@@ -95,6 +99,14 @@ public class Reader {
 
     public void setZoom(float zoom) {
         this.zoom = zoom;
+    }
+
+    public boolean isFullSize() {
+        return isFullSize;
+    }
+
+    public void setFullSize(boolean fullSize) {
+        isFullSize = fullSize;
     }
 }
 
