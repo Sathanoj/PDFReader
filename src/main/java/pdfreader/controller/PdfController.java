@@ -2,7 +2,7 @@ package pdfreader.controller;
 
 import pdfreader.model.DocInformation;
 import pdfreader.model.Reader;
-import pdfreader.view.MainFrame;
+import pdfreader.view.ReaderFrame;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
@@ -11,119 +11,136 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class PdfController {
-    private final MainFrame view;
-    private final Reader model;
-    private DocInformation information;
+    private final ReaderFrame readerFrame;
+    private final Reader reader;
+    private final DocInformation information;
+    private boolean isDefaultZoom;
 
-    public PdfController(MainFrame view, Reader model) {
-        this.view = view;
-        this.model = model;
+    public PdfController(ReaderFrame view, Reader model) {
+        this.readerFrame = view;
+        this.reader = model;
         information = new DocInformation(model);
+        isDefaultZoom = true;
 
         view.getFullSize().addActionListener(e -> fullSize());
+        view.getJumpToPageButton().addActionListener(e -> changePageTo());
         view.getNextButton().addActionListener(e -> nextPage());
         view.getPreviousButton().addActionListener(e -> previousPage());
-        view.getZoomInButton().addActionListener(e -> zoomIn());
-        view.getZoomOutButton().addActionListener(e -> zoomOut());
-        view.getJumpToPageButton().addActionListener(e -> changePageTo());
+//        view.getZoomInButton().addActionListener(e -> zoomIn());
+//        view.getZoomOutButton().addActionListener(e -> zoomOut());
+
         changePage();
+        zoomListener();
         updatePage();
     }
 
-    private void changePage() {
-        view.getPdfLabel().addMouseListener(new MouseAdapter() {
+    private void zoomListener() {
+        readerFrame.getZoomInButton().addActionListener(e -> {
+            isDefaultZoom = false;
+            zoomIn();
+        });
+        readerFrame.getZoomOutButton().addActionListener(e -> {
+            isDefaultZoom = false;
+            zoomOut();
+        });
+    }
+
+    public void changePage() {
+        readerFrame.getPdfLabel().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int clickX = e.getX();
-                int labelWidth = view.getPdfLabel().getWidth();
-                if (clickX < labelWidth / 2) {
-                    previousPage();
-                } else {
+                int labelWidth = readerFrame.getPdfLabel().getWidth();
+                if (clickX > labelWidth / 2) {
                     nextPage();
+                } else {
+                    previousPage();
                 }
             }
         });
     }
 
-    private void fullSize() {
+    public void fullSize() {
         try {
             BufferedImage resetFullSize =
-                    model.renderPdfAt100Percent(
-                            model.getCurrentPage(),
-                            view.getWidth(),
-                            view.getHeight());
-            view.getPdfLabel().setIcon(new ImageIcon(resetFullSize));
+                    reader.renderPdfAt100Percent(
+                            reader.getCurrentPage(),
+                            readerFrame.getWidth(),
+                            readerFrame.getHeight());
+            readerFrame.getPdfLabel().setIcon(new ImageIcon(resetFullSize));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     private void nextPage() {
-        if (model.getCurrentPage() < model.getTotalPages() - 1) {
-            model.pagePP();
+        if (reader.getCurrentPage() < reader.getTotalPages() - 1) {
+            reader.pagePP();
             updatePage();
         }
     }
 
     private void previousPage() {
-        if (model.getCurrentPage() > 0) {
-            model.pageLL();
+        if (reader.getCurrentPage() > 0) {
+            reader.pageLL();
             updatePage();
         }
     }
 
     private void zoomIn() {
-        model.zoomPP();
+        reader.zoomPP();
         updatePage();
     }
 
     private void zoomOut() {
-        if (model.getZoom() > 0.4f) { // Evita zoom muito pequeno
-            model.zoomLL();
+        if (reader.getZoom() > 0.4f) { // Evita zoom muito pequeno
+            reader.zoomLL();
             updatePage();
         }
     }
 
     public void changePageTo() {
-//        model.setCurrentPage(4);
         try {
-            String getValue = view.getCurrentPageFrame().getText();
-            model.findPage(Integer.parseInt(getValue));
+            String getValue = readerFrame.getCurrentPageFrame().getText();
+            reader.findPage(Integer.parseInt(getValue));
             updatePage();
 
         } catch (NumberFormatException exception) {
-            System.out.println("deu ruim: " + exception);
+            System.out.println("choose a real number: " + exception);
         }
-
-
-//        int value = model.findPage(v2);
     }
 
     private void enableTextSelection() {
-        view.getPdfLabel().addMouseListener(new MouseAdapter() {
+        readerFrame.getPdfLabel().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseMoved(MouseEvent event) {
                 int mouseX = event.getX();
                 int mouseY = event.getY();
 //                boolean isOverTex = model.isMouseOver(model.getCurrentPage(), mouseX, mouseY, zoom);
-
             }
         });
     }
 
+    public void manterMesmoZoom() {
+//        if (reader.getZoom() == ) {
+//
+//        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////////////////
     private void updatePage() {
+
         try {
-            BufferedImage pageImage = model.renderPage(model.getCurrentPage(), 150 * model.getZoom());
-            view.getPdfLabel().setIcon(new ImageIcon(pageImage));
+            BufferedImage pageImage = reader.renderPage(reader.getCurrentPage(), 150 * reader.getZoom());
+            readerFrame.getPdfLabel().setIcon(new ImageIcon(pageImage));
 
             information.showDocumentInfo();
             System.out.println();
-            System.out.println("Zoom value: " + model.getZoom());
-            System.out.println("Width: " + view.getWidth() + " Height: " + view.getHeight());
+            System.out.println("Zoom value: " + reader.getZoom());
+            System.out.println("Width: " + readerFrame.getWidth() + " Height: " + readerFrame.getHeight());
             System.out.println("----------------------------------------------------------");
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(view, "Error rendering page: " + e.getMessage());
+            JOptionPane.showMessageDialog(readerFrame, "Error rendering page: " + e.getMessage());
         }
     }
 }

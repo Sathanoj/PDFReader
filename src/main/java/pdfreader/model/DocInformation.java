@@ -1,6 +1,5 @@
 package pdfreader.model;
 
-import pdfreader.view.MainFrame;
 
 public class DocInformation {
 

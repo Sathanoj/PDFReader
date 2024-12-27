@@ -44,9 +44,6 @@ public class MainFrame extends JFrame {
         this.add(buttonPanel, BorderLayout.SOUTH);
     }
 
-
-
-
     public JButton getNextButton() {
         return nextButton;
     }
