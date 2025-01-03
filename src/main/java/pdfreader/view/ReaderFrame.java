@@ -12,6 +12,7 @@ public class ReaderFrame extends JFrame {
                         fullSize,
                         jumpToPageButton;
     private final JTextField currentPageFrame;
+    private JCheckBox checkBox;
 
     public ReaderFrame() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -31,8 +32,9 @@ public class ReaderFrame extends JFrame {
         fullSize = new JButton("full");
         currentPageFrame = new JTextField(5);
         jumpToPageButton = new JButton("jumpTo");
+        checkBox = new JCheckBox("full size", true);
 
-        buttonPanel.add(fullSize);
+        buttonPanel.add(checkBox);
         buttonPanel.add(previousButton);
         buttonPanel.add(nextButton);
         buttonPanel.add(zoomInButton);
@@ -73,5 +75,13 @@ public class ReaderFrame extends JFrame {
 
     public JTextField getCurrentPageFrame() {
         return currentPageFrame;
+    }
+
+    public JCheckBox getCheckBox() {
+        return checkBox;
+    }
+
+    public void setCheckBox(JCheckBox checkBox) {
+        this.checkBox = checkBox;
     }
 }

@@ -9,6 +9,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.BufferOverflowException;
 
 public class PdfController {
     private final ReaderFrame readerFrame;
@@ -22,13 +23,10 @@ public class PdfController {
         information = new DocInformation(model);
         isDefaultZoom = true;
 
-        view.getFullSize().addActionListener(e -> fullSize());
+        view.getCheckBox().addActionListener(e -> fullSize());
         view.getJumpToPageButton().addActionListener(e -> changePageTo());
         view.getNextButton().addActionListener(e -> nextPage());
         view.getPreviousButton().addActionListener(e -> previousPage());
-//        view.getZoomInButton().addActionListener(e -> zoomIn());
-//        view.getZoomOutButton().addActionListener(e -> zoomOut());
-
         changePage();
         zoomListener();
         updatePage();
@@ -61,16 +59,19 @@ public class PdfController {
     }
 
     public void fullSize() {
-        try {
-            BufferedImage resetFullSize =
-                    reader.renderPdfAt100Percent(
-                            reader.getCurrentPage(),
-                            readerFrame.getWidth(),
-                            readerFrame.getHeight());
-            readerFrame.getPdfLabel().setIcon(new ImageIcon(resetFullSize));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+            try {
+                BufferedImage resetFullSize =
+                        reader.renderPdfAt100Percent(
+                                reader.getCurrentPage(),
+                                readerFrame.getWidth(),
+                                readerFrame.getHeight());
+                readerFrame.getPdfLabel().setIcon(new ImageIcon(resetFullSize));
+                System.out.println(readerFrame.getCheckBox().isSelected());
+
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
     }
 
     private void nextPage() {
@@ -110,35 +111,34 @@ public class PdfController {
         }
     }
 
-    private void enableTextSelection() {
-        readerFrame.getPdfLabel().addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseMoved(MouseEvent event) {
-                int mouseX = event.getX();
-                int mouseY = event.getY();
-//                boolean isOverTex = model.isMouseOver(model.getCurrentPage(), mouseX, mouseY, zoom);
-            }
-        });
-    }
-
-    public void manterMesmoZoom() {
-//        if (reader.getZoom() == ) {
-//
-//        }
-    }
-
     ///////////////////////////////////////////////////////////////////////////////////////
     private void updatePage() {
 
         try {
-            BufferedImage pageImage = reader.renderPage(reader.getCurrentPage(), 150 * reader.getZoom());
-            readerFrame.getPdfLabel().setIcon(new ImageIcon(pageImage));
+            if (readerFrame.getCheckBox().isSelected()) {
+                BufferedImage fullSize = reader.renderPdfAt100Percent(
+                        reader.getCurrentPage(),
+                        readerFrame.getWidth(),
+                        readerFrame.getHeight());
+                readerFrame.getPdfLabel().setIcon(new ImageIcon(fullSize));
+                information.showDocumentInfo();
+                System.out.println("--------- PDF on full page size ---------------");
 
-            information.showDocumentInfo();
-            System.out.println();
-            System.out.println("Zoom value: " + reader.getZoom());
-            System.out.println("Width: " + readerFrame.getWidth() + " Height: " + readerFrame.getHeight());
-            System.out.println("----------------------------------------------------------");
+
+                System.out.println("Zoom value: " + reader.getZoom());
+                System.out.println("Width: " + readerFrame.getWidth() + " Height: " + readerFrame.getHeight());
+                System.out.println("----------------------------------------------------------");
+            } else {
+                System.out.println("--------- Unchecked box to zoom edit -----------");
+                BufferedImage pageImage = reader.renderPage(reader.getCurrentPage(), 150 * reader.getZoom());
+                readerFrame.getPdfLabel().setIcon(new ImageIcon(pageImage));
+
+                information.showDocumentInfo();
+                System.out.println();
+                System.out.println("Zoom value: " + reader.getZoom());
+                System.out.println("Width: " + readerFrame.getWidth() + " Height: " + readerFrame.getHeight());
+                System.out.println("----------------------------------------------------------");
+            }
         } catch (IOException e) {
             JOptionPane.showMessageDialog(readerFrame, "Error rendering page: " + e.getMessage());
         }
